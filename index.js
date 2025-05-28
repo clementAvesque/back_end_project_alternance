@@ -63,7 +63,7 @@ async function creatorcode() {
     try {
         let selectedData = [];
         let text ="";
-        const data = await fs.readFile('../rebus.json', 'utf-8');
+        const data = await fs.readFile('rebus.json', 'utf-8');
         const json = JSON.parse(data);
         for (let i = 0; i < 4; i++) {
             switch (i) {
@@ -119,7 +119,10 @@ app.get('/api/createUser', async (req, res) => {
     const { firstName, name, mail, phone } = req.query;
     const phoneInt = parseInt(phone, 10);
     if (!firstName || !name || !mail || !phone) {
-        return res.status(400).json({ error: 'Paramètres manquants' });
+        return res.status(400).json({
+            error: 'Paramètres manquants',
+            success: false
+        });
     }
     const newClient = await prisma.client.create({
         data: {
@@ -131,10 +134,10 @@ app.get('/api/createUser', async (req, res) => {
             code: code[0].join(''),
         },
     });
-    const response = await res.json({ client: newClient }); 
-    getMessageAndSend(newClient.id_user, newClient.message)
-        .then(() => console.log('Message envoyé avec succès'))
-    return response;
+    res.json({
+        client: newClient,
+        success: true
+    });
 });
 
 app.listen(3000, () => {
