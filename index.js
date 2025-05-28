@@ -116,7 +116,7 @@ app.get('/api/getClient', async (req, res) => {
 
 app.post('/api/createUser', async (req, res) => {
     let code = await creatorcode();
-    const { firstName, name, mail, phone } = req.query;
+    const { firstName, name, mail, phone } = req.body;
     const phoneInt = parseInt(phone, 10);
     if (!firstName || !name || !mail || !phone) {
         return res.status(400).json({
