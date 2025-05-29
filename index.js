@@ -11,6 +11,7 @@ const vonage = new Vonage({
     apiSecret: process.env.VONAGE_API_SECRET
 });
 const express = require('express');
+const { parse } = require('path');
 const app = express()
 const prisma = new PrismaClient()
 
@@ -140,9 +141,10 @@ app.post('/api/createUser', async (req, res) => {
         });
     } catch (error) {
         console.error('Erreur création utilisateur :', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message, success: false});
     }
 });
 
 app.listen(3000, () => {
+    console.log('http://localhost:3000');
 });
