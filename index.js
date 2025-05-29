@@ -114,29 +114,34 @@ app.get('/api/getClient', async (req, res) => {
 });
 
 app.post('/api/createUser', async (req, res) => {
-    let code = await creatorcode();
-    const { firstName, name, mail, phone } = req.body;
-    const phoneInt = parseInt(phone, 10);
-    if (!firstName || !name || !mail || !phone) {
-        return res.status(400).json({
-            error: 'Paramètres manquants',
-            success: false
+    try {
+        let code = await creatorcode();
+        const { firstName, name, mail, phone } = req.body;
+        const phoneInt = parseInt(phone, 10);
+        if (!firstName || !name || !mail || !phone) {
+            return res.status(400).json({
+                error: 'Paramètres manquants',
+                success: false
+            });
+        }
+        const newClient = await prisma.client.create({
+            data: {
+                firstName,
+                name,
+                mail,
+                phone: phoneInt,
+                message: code[1],
+                code: code[0].join(''),
+            },
         });
+        res.json({
+            client: newClient,
+            success: true
+        });
+    } catch (error) {
+        console.error('Erreur création utilisateur :', error);
+        res.status(500).json({ error: error.message });
     }
-    const newClient = await prisma.client.create({
-        data: {
-            firstName,
-            name,
-            mail,
-            phone: phoneInt,
-            message: code[1],
-            code: code[0].join(''),
-        },
-    });
-    res.json({
-        client: newClient,
-        success: true
-    });
 });
 
 app.listen(3000, () => {
