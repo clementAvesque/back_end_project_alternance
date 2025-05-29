@@ -15,7 +15,7 @@ const app = express()
 const prisma = new PrismaClient()
 
 app.use(cors())
-app.use(express.json()) 
+app.use(express.json())
 
 /////////////////fonction a utiliser pour le bon fonctionnement/////////////////
 function normalizePhoneNumber(phone) {
@@ -51,18 +51,18 @@ async function getMessageAndSend(id, mess) {
         from: "semloh",
         text: mess
     })
-    .then(resp => console.log('SMS envoyé !', resp))
-    .catch(err => {
-        console.error('Erreur envoi SMS :', err);
-        if (err.response && err.response.messages) {
-            console.log('Détail Vonage :', err.response.messages[0]);
-        }
-    });
+        .then(resp => console.log('SMS envoyé !', resp))
+        .catch(err => {
+            console.error('Erreur envoi SMS :', err);
+            if (err.response && err.response.messages) {
+                console.log('Détail Vonage :', err.response.messages[0]);
+            }
+        });
 }
 async function creatorcode() {
     try {
         let selectedData = [];
-        let text ="";
+        let text = "";
         const data = await fs.readFile('rebus.json', 'utf-8');
         const json = JSON.parse(data);
         for (let i = 0; i < 4; i++) {
@@ -80,22 +80,21 @@ async function creatorcode() {
                     text += "et mon quatrième"
                     break;
             }
-            let data;
+            let index;
             do {
-                data = Math.floor((Math.random() * json.length))
-            }while (selectedData.includes(data)) 
-        
-        selectedData.push(json[data].lettre);
-        text += ` ${json[data].phrase}`;
-        }
+                index = Math.floor((Math.random() * json.length))
+            } while (selectedData.includes(data))
 
-        console.log(selectedData);
-        console.log(text);
+            selectedData.push(json[index].lettre);
+            text += ` ${json[index].phrase}`;
+        }
         return [selectedData, text];
     } catch (error) {
         console.error('Erreur lors de la récupération du code :', error);
     }
 }
+
+creatorcode()
 
 async function findClientByPhone(phone) {
     // Si tu stockes le numéro comme Int dans la base :
