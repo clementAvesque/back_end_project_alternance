@@ -83,7 +83,7 @@ async function creatorcode() {
             let index;
             do {
                 index = Math.floor((Math.random() * json.length))
-            } while (selectedData.includes(data))
+            } while (selectedData.includes(json[index].lettre))
 
             selectedData.push(json[index].lettre);
             text += ` ${json[index].phrase}`;
