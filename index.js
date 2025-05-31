@@ -11,7 +11,6 @@ const vonage = new Vonage({
     apiSecret: process.env.VONAGE_API_SECRET
 });
 const express = require('express');
-const { parse } = require('path');
 const app = express()
 const prisma = new PrismaClient()
 
@@ -94,24 +93,16 @@ async function creatorcode() {
         console.error('Erreur lors de la récupération du code :', error);
     }
 }
-
-creatorcode()
-
-async function findClientByPhone(phone) {
-    // Si tu stockes le numéro comme Int dans la base :
-    const phoneInt = parseInt(phone, 10);
-    const client = await prisma.client.findUnique({
-        where: { phone: phoneInt },
-    });
-    return client;
-}
 ///////////////////////////les routes de l'API/////////////////////////////////
 
-app.get('/api/getClient', async (req, res) => {
-    const { phone } = req.query;
-    const client = await findClientByPhone(phone);
-
-    res.json({ client });
+app.post('/api/getClient', async (req, res) => {
+    const { phone } = req.body;
+    try {
+        const client = await getClientBynumber(phone);
+        res.json({ client });
+    } catch (error) {
+        res.json({ error: 'aucun profil correspond au numéro' });
+    }
 });
 
 app.post('/api/createUser', async (req, res) => {
@@ -139,11 +130,17 @@ app.post('/api/createUser', async (req, res) => {
             client: newClient,
             success: true
         });
+        //let currentclient = await getClientBynumber(phoneInt)
+        //await getMessageAndSend(currentclient.id_user, currentclient.message);
+
+
     } catch (error) {
         console.error('Erreur création utilisateur :', error);
-        res.status(500).json({ error: error.message, success: false});
+        res.status(500).json({ error: error.message, success: false });
     }
 });
+
+
 
 app.listen(3000, () => {
     console.log('http://localhost:3000');
