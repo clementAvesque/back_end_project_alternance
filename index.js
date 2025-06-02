@@ -1,9 +1,10 @@
 ///////////////////////////voici les preriquis pour le bon fonctionnement du back end///////////////////
 const express = require('express');
 const app = express()
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient()
 const fs = require('fs').promises;
-const { PrismaClient } = require('@prisma/client');
+
 const cors = require('cors')
 const { Vonage } = require('@vonage/server-sdk');
 
