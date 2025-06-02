@@ -1,18 +1,26 @@
 ///////////////////////////voici les preriquis pour le bon fonctionnement du back end///////////////////
-
-
+const express = require('express');
+const app = express()
+const prisma = new PrismaClient()
+const fs = require('fs').promises;
 const { PrismaClient } = require('@prisma/client');
 const cors = require('cors')
 const { Vonage } = require('@vonage/server-sdk');
-const fs = require('fs').promises;
 
 const vonage = new Vonage({
     apiKey: process.env.VONAGE_API_KEY,
     apiSecret: process.env.VONAGE_API_SECRET
 });
-const express = require('express');
-const app = express()
-const prisma = new PrismaClient()
+
+
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // ou ton service SMTP
+    auth: {
+        user: process.env.MAIL_USER, // ton adresse email
+        pass: process.env.MAIL_PASS  // ton mot de passe ou app password
+    }
+});
 
 app.use(cors())
 app.use(express.json())
@@ -39,15 +47,13 @@ async function getClientBynumber(numb) {
     return client;
 }
 
-async function getMessageAndSend(id, mess) {
+async function getMessageAndSend(phone) {
     const message = await prisma.client.findUnique({
-        where: { id_user: id },
+        where: { phone: parseInt(phone, 10) },
     });
-    let numero = message.phone.toString();
-    console.log(normalizePhoneNumber(numero));
-
-    await vonage.sms.send({
-        to: normalizePhoneNumber(numero),
+    let numero = message.phone;
+    /*await vonage.sms.send({
+        to: numero,
         from: "semloh",
         text: mess
     })
@@ -58,7 +64,9 @@ async function getMessageAndSend(id, mess) {
                 console.log('Détail Vonage :', err.response.messages[0]);
             }
         });
+        */
 }
+
 async function creatorcode() {
     try {
         let selectedData = [];
@@ -93,51 +101,66 @@ async function creatorcode() {
         console.error('Erreur lors de la récupération du code :', error);
     }
 }
+
+
 ///////////////////////////les routes de l'API/////////////////////////////////
 
 app.post('/api/getClient', async (req, res) => {
     const { phone } = req.body;
     try {
         const client = await getClientBynumber(phone);
-        res.json({ client });
+        res.json({ client, success: true });
     } catch (error) {
-        res.json({ error: 'aucun profil correspond au numéro' });
+        res.json({ error: 'aucun profil correspond au numéro', success: false });
     }
 });
 
 app.post('/api/createUser', async (req, res) => {
-    try {
-        let code = await creatorcode();
-        const { firstName, name, mail, phone } = req.body;
-        const phoneInt = parseInt(phone, 10);
-        if (!firstName || !name || !mail || !phone) {
-            return res.status(400).json({
-                error: 'Paramètres manquants',
-                success: false
+
+    async function createClient(firstName, name, mail, phoneInt, message, code) {
+        try {
+            await prisma.client.create({
+                data: { firstName, name, mail, phone: phoneInt, message, code }
             });
+            return true; // Succès
+        } catch (err) {
+            console.error('Erreur Prisma:', err);
+            return false; // Échec
         }
-        const newClient = await prisma.client.create({
-            data: {
-                firstName,
-                name,
-                mail,
-                phone: phoneInt,
-                message: code[1],
-                code: code[0].join(''),
-            },
-        });
-        res.json({
-            client: newClient,
-            success: true
-        });
-        //let currentclient = await getClientBynumber(phoneInt)
-        //await getMessageAndSend(currentclient.id_user, currentclient.message);
-
-
-    } catch (error) {
-        console.error('Erreur création utilisateur :', error);
-        res.status(500).json({ error: error.message, success: false });
     }
+
+
+    let code = await creatorcode();
+    const { firstName, name, mail, phone } = req.body;
+    let phoneInt = normalizePhoneNumber
+    phoneInt = parseInt(phone, 10);
+
+    // Tente de créer le client
+    let user = await createClient(firstName, name, mail, phoneInt, code[1], code[0].join(''));
+    if (user === false) {
+        return res.json({ success: false });
+    } else {
+        // Création réussie
+        getMessageAndSend(phoneInt)
+        return res.json({ success: true });
+    }
+
+})
+
+app.post('/api/sendMail', async (req, res) => {
+    const { tel } = req.body; // ou phone si tu préfères
+    const user = await getClientBynumber(tel);
+    const mailOptions = {
+        from: process.env.MAIL_USER,
+        to: user.mail,
+        subject: "Votre message personnalisé",
+        text: `Bonjour ${user.firstName},\n\nMerci pour votre participation !`
+    }
+
+        // Envoie le mail
+        await transporter.sendMail(mailOptions);
+        res.json({ success: true, message: "Mail envoyé !" });
+
 });
 
 
