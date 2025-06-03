@@ -51,7 +51,7 @@ async function getClientBynumber(numb) {
     return client;
 }
 
-async function getMessageAndSend(phone) {
+async function getMessageAndSend(phone, mess) {
     const message = await prisma.client.findUnique({
         where: { phone: parseInt(phone, 10) },
     });
@@ -144,7 +144,7 @@ app.post('/api/createUser', async (req, res) => {
     if (user === false) {
         return res.json({ success: false });
     } else {
-        getMessageAndSend(phoneInt)
+        getMessageAndSend(phoneInt, code[1]);
         return res.json({ success: true });
     }
 
