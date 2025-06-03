@@ -52,7 +52,7 @@ async function getClientBynumber(numb) {
 }
 
 async function getMessageAndSend(phone, mess) {
-
+    /*
     await vonage.sms.send({
         to: phone,
         from: "semloh",
@@ -65,7 +65,7 @@ async function getMessageAndSend(phone, mess) {
                 console.log('Détail Vonage :', err.response.messages[0]);
             }
         });
-        
+        */
 }
 
 async function creatorcode() {
@@ -77,7 +77,7 @@ async function creatorcode() {
         for (let i = 0; i < 4; i++) {
             switch (i) {
                 case 0:
-                    text += "Merci de participer à cette évenement, voici le début de l'enquete! on nous à laisser une rébus, a toi de trouver le code a 4 lettre! Quand tu auras trouver dirige toi vers l'ecran a ta disposition pour rentré ton code et recevoir l'emplacement de notre evenement spécial autrement dit cela sert a rien de répondre a se message! Voici le code : Mon premier"
+                    text += "Voici le début de l’enquête : un rébus t’a été laissé. Trouve le code à 4 lettres, puis entre-le sur l’écran à ta disposition pour découvrir l’emplacement de notre événement spécial. No reply. Voici le code : Mon premier"
                     break;
                 case 1:
                     text += "Mon second"
