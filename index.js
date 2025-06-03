@@ -19,7 +19,10 @@ const transporter = nodemailer.createTransport({
     service: 'gmail', // ou ton service SMTP
     auth: {
         user: process.env.MAIL_USER, // ton adresse email
-        pass: process.env.MAIL_PASS  // ton mot de passe ou app password
+        pass: process.env.MAIL_PASSWORD  // app password
+    },
+    tls: {
+        rejectUnauthorized: false
     }
 });
 
@@ -43,7 +46,7 @@ async function getClientBynumber(numb) {
         },
     });
     if (!client) {
-        throw new Error('Client not found');
+        return false;
     }
     return client;
 }
@@ -149,20 +152,24 @@ app.post('/api/createUser', async (req, res) => {
 })
 
 app.post('/api/sendMail', async (req, res) => {
-    const { tel } = req.body; // ou phone si tu préfères
-    const user = await getClientBynumber(tel);
+    const { phone } = req.body; // ou phone si tu préfères
+    const user = await getClientBynumber(phone);
     const mailOptions = {
         from: process.env.MAIL_USER,
         to: user.mail,
-        subject: "Votre message personnalisé",
-        text: `Bonjour ${user.firstName},\n\nMerci pour votre participation !`
+        subject: "BRAVO, tu as réussi à trouver le code !",
+        text: `Bonjour ${user.firstName},\n\nMerci pour votre participation ! \n\n tu trouveras la carte pour trouver les pépites du web a traevrs la foule`,
+        attachments: [
+            {
+                filename: 'troll.png',
+            }
+        ]
     }
 
         // Envoie le mail
         await transporter.sendMail(mailOptions);
-        res.json({ success: true, message: "Mail envoyé !" });
 
-});
+    });
 
 
 
