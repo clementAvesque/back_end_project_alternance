@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail', // ou ton service SMTP
     auth: {
         user: process.env.MAIL_USER, // ton adresse email
-        pass: process.env.MAIL_PASSWORD  // app password
+        pass: process.env.MAIL_PASS  // app password
     },
     tls: {
         rejectUnauthorized: false
@@ -144,7 +144,6 @@ app.post('/api/createUser', async (req, res) => {
     if (user === false) {
         return res.json({ success: false });
     } else {
-        // Création réussie
         getMessageAndSend(phoneInt)
         return res.json({ success: true });
     }
