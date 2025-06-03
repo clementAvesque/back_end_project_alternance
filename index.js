@@ -56,7 +56,7 @@ async function getMessageAndSend(phone) {
         where: { phone: parseInt(phone, 10) },
     });
     let numero = message.phone;
-    /*await vonage.sms.send({
+    await vonage.sms.send({
         to: numero,
         from: "semloh",
         text: mess
@@ -68,7 +68,7 @@ async function getMessageAndSend(phone) {
                 console.log('Détail Vonage :', err.response.messages[0]);
             }
         });
-        */
+        
 }
 
 async function creatorcode() {
