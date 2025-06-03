@@ -52,12 +52,9 @@ async function getClientBynumber(numb) {
 }
 
 async function getMessageAndSend(phone, mess) {
-    const message = await prisma.client.findUnique({
-        where: { phone: parseInt(phone, 10) },
-    });
-    let numero = message.phone;
+
     await vonage.sms.send({
-        to: numero,
+        to: phone,
         from: "semloh",
         text: mess
     })
@@ -136,21 +133,21 @@ app.post('/api/createUser', async (req, res) => {
 
     let code = await creatorcode();
     const { firstName, name, mail, phone } = req.body;
-    let phoneInt = normalizePhoneNumber
-    phoneInt = parseInt(phone, 10);
-
-    // Tente de créer le client
-    let user = await createClient(firstName, name, mail, phoneInt, code[1], code[0].join(''));
+        let user = await createClient(firstName, name, mail, parseInt(phone,10), code[1], code[0].join(''));
     if (user === false) {
         return res.json({ success: false });
     } else {
-        getMessageAndSend(phoneInt, code[1]);
+        phoneInt = normalizePhoneNumber(phone);
+        let tirade = await code[1]
+        getMessageAndSend(phoneInt, tirade);
         return res.json({ success: true });
     }
+    
+
 
 })
 
-app.post('/api/sendMail', async (req, res) => {
+app.post('/api/sendMail', async (req) => {
     const { phone } = req.body; // ou phone si tu préfères
     const user = await getClientBynumber(phone);
     const mailOptions = {
