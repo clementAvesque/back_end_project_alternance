@@ -52,7 +52,6 @@ async function getClientBynumber(numb) {
 }
 
 async function getMessageAndSend(phone, mess) {
-    /*
     await vonage.sms.send({
         to: phone,
         from: "semloh",
@@ -65,7 +64,7 @@ async function getMessageAndSend(phone, mess) {
                 console.log('Détail Vonage :', err.response.messages[0]);
             }
         });
-        */
+        
 }
 
 async function creatorcode() {
@@ -138,8 +137,7 @@ app.post('/api/createUser', async (req, res) => {
         return res.json({ success: false });
     } else {
         phoneInt = normalizePhoneNumber(phone);
-        let tirade = await code[1]
-        getMessageAndSend(phoneInt, tirade);
+        getMessageAndSend(phoneInt, await code[1]);
         return res.json({ success: true });
     }
     
