@@ -52,6 +52,7 @@ async function getClientBynumber(numb) {
 }
 
 async function getMessageAndSend(phone, mess) {
+    /*
     await vonage.sms.send({
         to: phone,
         from: "semloh",
@@ -63,7 +64,7 @@ async function getMessageAndSend(phone, mess) {
             if (err.response && err.response.messages) {
                 console.log('Détail Vonage :', err.response.messages[0]);
             }
-        });
+        });*/
         
 }
 
