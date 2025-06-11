@@ -156,7 +156,7 @@ app.post('/api/sendMail', async (req) => {
         text: `Bonjour ${user.firstName},\n\nMerci pour votre participation ! \n\n tu trouveras la carte pour trouver les pépites du web a traevrs la foule`,
         attachments: [
             {
-                filename: 'troll.png',
+                filename: 'carte.pdf',
             }
         ]
     }
